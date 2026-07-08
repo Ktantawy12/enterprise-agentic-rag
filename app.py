@@ -1,7 +1,31 @@
 import streamlit as st
 
-st.set_page_config(page_title="Enterprise Agentic RAG", page_icon="🤖")
+from src.rag.chain import ask
 
-st.title("Enterprise Agentic RAG Assistant")
 
-st.write("Welcome! This is the beginning of our AI assistant.")
+st.set_page_config(
+    page_title="Enterprise Agentic RAG",
+    page_icon="🤖",
+)
+
+st.title("🤖 Enterprise Agentic RAG")
+
+st.write(
+    "Ask questions about the uploaded banking documents."
+)
+
+question = st.text_input(
+    "Enter your question:"
+)
+
+if st.button("Ask"):
+
+    if question:
+
+        with st.spinner("Thinking..."):
+
+            answer = ask(question)
+
+        st.subheader("Answer")
+
+        st.write(answer)
