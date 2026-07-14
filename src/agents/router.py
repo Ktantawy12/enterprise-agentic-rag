@@ -1,21 +1,45 @@
-
-CITATION_KEYWORDS = [
-    "cite",
+RESEARCH_KEYWORDS = [
+    "paper",
+    "papers",
+    "research",
+    "study",
+    "studies",
+    "journal",
+    "article",
+    "author",
+    "authors",
     "citation",
+    "citations",
+    "cite",
+    "reference",
+    "references",
+    "doi",
+    "bibtex",
     "apa",
     "mla",
     "ieee",
-    "bibtex",
-    "doi",
-    "reference",
-    "references",
-    "author",
+    "related paper",
+    "similar paper",
+    "seminal",
+    "review paper",
 ]
+
+
+RESEARCH_PREFIXES = [
+    "doi:",
+    "recommend:",
+    "network:",
+]
+
+
 def router(state):
 
-    question = state["question"].lower()
+    question = state["question"].strip().lower()
 
-    if any(word in question for word in CITATION_KEYWORDS):
+    if (
+        any(question.startswith(prefix) for prefix in RESEARCH_PREFIXES)
+        or any(keyword in question for keyword in RESEARCH_KEYWORDS)
+    ):
         state["route"] = "citation"
     else:
         state["route"] = "rag"

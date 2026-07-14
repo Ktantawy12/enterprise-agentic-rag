@@ -4,138 +4,113 @@ from src.graph.graph import graph
 from src.vectordb.chroma_db import load_vector_store
 
 
-# =====================================================
-# PAGE CONFIG
-# =====================================================
+# --------------------------------------------------
+# Page Configuration
+# --------------------------------------------------
 
 st.set_page_config(
-    page_title="Research AI Assistant",
-    page_icon="🤖",
+    page_title="AI Research Assistant",
+    page_icon="📚",
     layout="wide",
 )
 
-
-# =====================================================
-# VECTOR DATABASE STATS
-# =====================================================
-
-vector_store = load_vector_store()
-
-db = vector_store.get()
-
-num_chunks = len(db["documents"])
-
-sources = {
-    metadata["source"]
-    for metadata in db["metadatas"]
-}
-
-num_documents = len(sources)
+load_vector_store()
 
 
-# =====================================================
-# SESSION STATE
-# =====================================================
+# --------------------------------------------------
+# Session State
+# --------------------------------------------------
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-if "welcome_shown" not in st.session_state:
-    st.session_state.welcome_shown = False
 
-
-# =====================================================
-# SIDEBAR
-# =====================================================
+# --------------------------------------------------
+# Sidebar
+# --------------------------------------------------
 
 with st.sidebar:
 
-    st.title("🤖 Research AI Assistant")
+    st.title("📚 AI Research Assistant")
 
-    st.divider()
-
-    st.write(f"📄 Documents: {num_documents}")
-    st.write("🧠 Model: GPT-4.1")
-
-    st.divider()
-
-    if st.button(
-        "🗑️ Clear Conversation",
-        use_container_width=True,
-    ):
-
+    if st.button("🗑️ Clear Conversation", use_container_width=True):
         st.session_state.messages = []
-        st.session_state.welcome_shown = False
-
         st.rerun()
 
+    st.markdown("---")
 
-# =====================================================
-# HEADER
-# =====================================================
+    st.subheader("Capabilities")
 
-st.markdown(
-    """
-<h1 style="text-align:center; font-size:52px;">
- Research AI Assistant
-</h1>
+    st.markdown(
+        """
+- 📄 Answer questions from uploaded documents
+- 🔍 Search academic papers
+- 🌟 Discover seminal papers
+- 🤝 Find related research
+- 🕸️ Explore citation networks
+"""
+    )
 
-<h4 style="text-align:center; color:#CBD5E1;">
-Research Retrieval-Augmented Generation Assistant
-</h4>
-""",
-    unsafe_allow_html=True,
+    st.markdown("---")
+
+    st.subheader("Example Questions")
+
+    st.markdown(
+        """
+### 📄 Document Questions
+
+- What documents are required for a personal loan?
+- What is the maximum loan amount?
+- What is the interest rate?
+
+### 🔬 Research Questions
+
+- Find papers about LangGraph
+- Find seminal papers about transformers
+- Find papers about SQL
+
+### 📑 Paper Commands
+
+- DOI:10.48550/arXiv.1706.03762
+- recommend:https://openalex.org/W4405094415
+- network:https://openalex.org/W4405094415
+"""
+    )
+
+    st.markdown("---")
+
+    st.caption("Version 1.0")
+
+
+# --------------------------------------------------
+# Main Page
+# --------------------------------------------------
+
+st.title("📚 AI Research Assistant")
+
+st.caption(
+    "Ask questions about your uploaded documents or explore academic research using OpenAlex."
 )
 
 
-# =====================================================
-# WELCOME MESSAGE
-# =====================================================
-
-if not st.session_state.welcome_shown:
-
-    with st.chat_message("assistant"):
-
-        st.markdown(
-            """
-## 👋 Welcome!
-
-Ask me anything about your uploaded documents.
-"""
-        )
-
-    st.session_state.welcome_shown = True
-
-
-# =====================================================
-# DISPLAY CHAT HISTORY
-# =====================================================
+# --------------------------------------------------
+# Display Chat History
+# --------------------------------------------------
 
 for message in st.session_state.messages:
 
     with st.chat_message(message["role"]):
-
         st.markdown(message["content"])
 
 
-# =====================================================
-# CHAT INPUT
-# =====================================================
+# --------------------------------------------------
+# Chat Input
+# --------------------------------------------------
 
-question = st.chat_input(
-    "Ask a question..."
-)
+question = st.chat_input("Ask a question...")
 
-
-# =====================================================
-# GENERATE RESPONSE
-# =====================================================
 
 if question:
-
-    # -------------------------------
-    # Save & display user message
-    # -------------------------------
 
     st.session_state.messages.append(
         {
@@ -145,58 +120,33 @@ if question:
     )
 
     with st.chat_message("user"):
-
         st.markdown(question)
 
-    # -------------------------------
-    # Assistant response
-    # -------------------------------
+    with st.spinner("Thinking..."):
 
-    with st.chat_message("assistant"):
+        try:
 
-        with st.spinner("Searching documents and generating answer..."):
+            state = {
+                "question": question,
+                "route": "",
+                "answer": "",
+                "documents": [],
+            }
 
-            result = graph.invoke(
-                {
-                    "question": question,
-                    "answer": "",
-                    "documents": [],
-                }
-            )
+            result = graph.invoke(state)
 
             answer = result["answer"]
-            documents = result["documents"]
 
-        with st.container(border=True):
+        except Exception as e:
 
-            st.markdown(answer)
-
-        with st.expander("📚 Sources Used"):
-
-            for doc in documents:
-
-                source = doc.metadata.get("source", "Unknown")
-                source = source.replace("\\", "/").split("/")[-1]
-
-                page = doc.metadata.get("page", 0) + 1
-
-                st.markdown(f"**📄 {source}**")
-                st.caption(f"Page {page}")
-
-                preview = doc.page_content[:250]
-
-                st.write(preview + "...")
-
-                st.divider()
-
-    # -------------------------------
-    # Save assistant message
-    # -------------------------------
+            answer = f"❌ {e}"
 
     st.session_state.messages.append(
         {
             "role": "assistant",
             "content": answer,
-            "documents": documents,
         }
     )
+
+    with st.chat_message("assistant"):
+        st.markdown(answer)
