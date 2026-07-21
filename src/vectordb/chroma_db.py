@@ -86,10 +86,8 @@ def load_or_create_vector_store():
 
 if __name__ == "__main__":
 
-    # Development: always rebuild after changing PDFs
     vector_store = rebuild_vector_store()
 
-    # Production:
     # vector_store = load_or_create_vector_store()
 
     data = vector_store.get()
