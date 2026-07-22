@@ -4,6 +4,7 @@ from src.graph.graph import graph
 from src.vectordb.chroma_db import load_vector_store
 
 
+st.write("OPENAI KEY FOUND:", bool(os.environ.get("OPENAI_API_KEY")))
 
 st.set_page_config(
     page_title="AI Research Assistant",
