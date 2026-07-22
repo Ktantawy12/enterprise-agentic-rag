@@ -8,9 +8,8 @@ Built with **LangGraph**, **LangChain**, **OpenAI GPT-4.1 Mini**, **ChromaDB**, 
 
 ## 🚀 Live Demo
 
-🌐 **Application:** *(Coming Soon)*
 
-🎥 **Video Demo:** *(Coming Soon)*
+🎥 **Video Demo:** (https://youtu.be/TJ2hDdgYdmI)
 
 ---
 
