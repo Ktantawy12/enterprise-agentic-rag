@@ -261,7 +261,7 @@ This project is licensed under the MIT License.
 
 GitHub: https://github.com/Ktantawy12
 
-LinkedIn: *(Add your LinkedIn profile URL)*
+LinkedIn: linkedin.com/in/karim-tantawy
 
 ---
 
